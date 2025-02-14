@@ -1,22 +1,50 @@
 # ISHNE Parser
 
 ## Description
-This library allows reading and analyzing ISHNE format files, a standard for storing Holter ECG data. It implements reading the header, ECG signals, and exporting data to JSON.
+This library allows reading and analyzing ISHNE format files, a standard for storing Holter ECG data. It implements reading the header, ECG signals, and exporting data to various formats.
 
 > ⚠️ **Warning**: This package is still under development and is not recommended for production use.
 
 ## Usage
 
-### Load and parse an ISHNE file
+### Basic usage
 ```ts
-import { IshneParser } from "ishne-parser";
-import { readFileSync } from "fs";
+import * as ishne from "jsr:@iradev/ishne";
 
-const buffer = readFileSync("./file.ish");
-const parser = new IshneParser(new Uint8Array(buffer));
+
+const parser = new IshneParser(Deno.readFileSync("file.ecg"));
 const header = parser.parseHeader();
 const ecgData = parser.parseEcgData();
-console.log(parser.toJson());
+```
+
+### Export Data
+```ts
+// Export to JSON
+await parser.exportToJson("output.json", {
+  timeColumn: true,
+  decimalPlaces: 2
+});
+
+// Export to CSV
+await parser.exportToCsv("output.csv", {
+  separator: ",",
+  includeHeader: true,
+  timeColumn: true,
+  decimalPlaces: 2
+});
+
+// Export to Text (tab-separated)
+await parser.exportToText("output.txt");
+```
+
+### Export Options
+```ts
+interface ExportOptions {
+  separator?: string;        // Separator for CSV/TXT (default: ',' for CSV, '\t' for TXT)
+  includeHeader?: boolean;   // Include column headers (default: true)
+  timeColumn?: boolean;      // Include time column (default: true)
+  decimalPlaces?: number;    // Number of decimal places (default: 2)
+}
 ```
 
 ## ISHNE File Structure
